@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Redesign App</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>
+        // Tailwind CSS configuration for custom colors and border-radius
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1',
+                        secondary: '#a5b4fc'
+                    },
+                    borderRadius: {
+                        'none': '0px',
+                        'sm': '4px',
+                        DEFAULT: '8px',
+                        'md': '12px',
+                        'lg': '16px',
+                        'xl': '20px',
+                        '2xl': '24px',
+                        '3xl': '32px',
+                        'full': '9999px',
+                        'button': '8px' // Custom button radius
+                    }
+                }
+            }
+        };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <header class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center">
+                <i class="fas fa-couch text-primary text-2xl mr-2"></i>
+                <h1 class="text-xl font-bold text-gray-900 font-['Pacifico']">RoomRestyle</h1>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div class="relative pt-1">
+            <div class="flex mb-2 items-center justify-between">
+                <div>
+                    <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-primary bg-indigo-100">
+                        Progress
+                    </span>
+                </div>
+                <div class="text-right">
+                    <span id="progressText" class="text-xs font-semibold inline-block text-primary">
+                        Step 1 of 4
+                    </span>
+                </div>
+            </div>
+            <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-indigo-100">
+                <div id="progressBarFill" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-primary transition-all duration-500 ease-in-out progress-bar-fill" style="width: 0%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <section id="step1" class="animate-fadeIn">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">Upload Your Room Image</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Upload an image of your room and tell us what object you want to remove.
+                </p>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div id="uploadArea" class="border-2 border-dashed border-indigo-300 rounded-lg p-8 flex flex-col items-center justify-center bg-indigo-50 hover:bg-indigo-100 transition-colors duration-200 cursor-pointer h-96">
+                    <div id="uploadPlaceholder" class="flex flex-col items-center justify-center">
+                        <div class="text-primary mb-4">
+                            <i class="fas fa-cloud-upload-alt text-6xl"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-1">Drop your image here</h3>
+                        <p class="text-sm text-gray-500 mb-4">or click to browse</p>
+                        <button class="bg-white border border-indigo-300 text-primary px-4 py-2 rounded-md hover:bg-indigo-50 transition-colors duration-200 cursor-pointer !rounded-button whitespace-nowrap">
+                            <i class="fas fa-image mr-2"></i>
+                            Select Image
+                        </button>
+                    </div>
+                    <img id="uploadedImagePreview" src="" alt="Uploaded room" class="w-full h-full object-contain rounded-md hidden" />
+                    <button id="changeImageBtn" class="!rounded-button whitespace-nowrap mt-4 bg-primary text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors duration-200 cursor-pointer hidden">
+                        <i class="fas fa-sync-alt mr-2"></i>
+                        Change Image
+                    </button>
+
+                    <input type="file" id="fileInput" accept="image/*" class="hidden" />
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-8">
+                    <h3 class="text-xl font-medium text-gray-900 mb-4">What would you like to remove?</h3>
+                    <p class="text-gray-600 mb-4">
+                        Describe the object you want to remove from your image. Be specific for better results.
+                    </p>
+                    <div class="mb-6">
+                        <label for="objectDescription" class="block text-sm font-medium text-gray-700 mb-1">
+                            Object Description
+                        </label>
+                        <textarea
+                            id="objectDescription"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200"
+                            rows="4"
+                            placeholder="E.g., 'The old brown sofa in the center' or 'The coffee table with books'"
+                        ></textarea>
+                    </div>
+                    <div class="flex items-center text-sm text-gray-500 mb-6">
+                        <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
+                        <span>Tip: The more details you provide, the better the results will be.</span>
+                    </div>
+                    <button
+                        id="previewBtn"
+                        class="w-full bg-primary text-white px-6 py-3 rounded-md hover:bg-indigo-700 transition-colors duration-200 cursor-pointer flex items-center justify-center !rounded-button whitespace-nowrap opacity-50 cursor-not-allowed"
+                        disabled
+                    >
+                        <i class="fas fa-eye mr-2"></i>
+                        Preview
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="step2" class="hidden animate-fadeIn">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">Preview & Confirm</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Please review your image and the object you want to remove.
+                </p>
+            </div>
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2">
+                    <div class="p-6 border-b lg:border-b-0 lg:border-r border-gray-200">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Your Image</h3>
+                        <div class="bg-gray-100 rounded-md overflow-hidden">
+                            <img
+                                id="originalPreviewInStep2"
+                                src=""
+                                alt="Uploaded room"
+                                class="w-full h-64 object-contain"
+                            />
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Object to Remove</h3>
+                        <div class="bg-gray-100 rounded-md p-4 mb-4">
+                            <p id="removalDescription" class="text-gray-800"></p>
+                        </div>
+                        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm text-yellow-700">
+                                        Once processed, we'll remove the specified object from your image. This process cannot be undone.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-6 py-4 flex justify-between items-center">
+                    <button
+                        id="backToStep1"
+                        class="text-gray-700 hover:text-gray-900 transition-colors duration-200 cursor-pointer !rounded-button whitespace-nowrap"
+                    >
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Back
+                    </button>
+                    <div class="flex space-x-4">
+                        <button
+                            id="editBtn"
+                            class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors duration-200 cursor-pointer !rounded-button whitespace-nowrap"
+                        >
+                            Edit
+                        </button>
+                        <button
+                            id="processBtn"
+                            class="bg-primary text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition-colors duration-200 cursor-pointer flex items-center !rounded-button whitespace-nowrap"
+                        >
+                            <i class="fas fa-magic mr-2"></i>
+                            Process Image
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="step3" class="hidden animate-fadeIn">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">Select a Bed</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Choose a bed to place in your newly edited room.
+                </p>
+            </div>
+            <div class="mb-8">
+                <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Your Processed Image</h3>
+                    <div class="bg-gray-100 rounded-md overflow-hidden">
+                        <img
+                            id="processedRoomImage"
+                            src=""
+                            alt="Processed room"
+                            class="w-full h-64 object-contain"
+                        />
+                    </div>
+                </div>
+                <h3 class="text-xl font-medium text-gray-900 mb-4">Available Beds</h3>
+                <div id="bedOptionsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    </div>
+            </div>
+            <div class="flex justify-between">
+                <button
+                    id="backToStep2"
+                    class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors duration-200 cursor-pointer !rounded-button whitespace-nowrap"
+                >
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Back
+                </button>
+            </div>
+        </section>
+
+        <section id="step4" class="hidden animate-fadeIn">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">Place Your Bed</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Drag, resize, and position the bed in your room.
+                </p>
+            </div>
+            <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+                <div class="p-4 bg-gray-100 border-b border-gray-200">
+                    <div class="flex flex-wrap items-center justify-between gap-4">
+                        <div class="flex space-x-2">
+                            <button id="undoBtn" class="bg-white border border-gray-300 text-gray-700 px-3 py-1 rounded-md hover:bg-gray-50 transition-colors duration-200 cursor-pointer !rounded-button whitespace-nowrap">
+                                <i class="fas fa-undo text-sm mr-1"></i> Undo
+                            </button>
+                            <button id="redoBtn" class="bg-white border border-gray-300 text-gray-700 px-3 py-1 rounded-md hover:bg-gray-50 transition-colors duration-200 cursor-pointer !rounded-button whitespace-nowrap">
+                                <i class="fas fa-redo text-sm mr-1"></i> Redo
+                            </button>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button id="zoomInBtn" class="bg-white border border-gray-300 text-gray-700 px-3 py-1 rounded-md hover:bg-gray-50 transition-colors duration-200 cursor-pointer !rounded-button whitespace-nowrap">
+                                <i class="fas fa-search-plus text-sm mr-1"></i> Zoom In
+                            </button>
+                            <button id="zoomOutBtn" class="bg-white border border-gray-300 text-gray-700 px-3 py-1 rounded-md hover:bg-gray-50 transition-colors duration-200 cursor-pointer !rounded-button whitespace-nowrap">
+                                <i class="fas fa-search-minus text-sm mr-1"></i> Zoom Out
+                            </button>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button id="moveBtn" class="bg-white border border-gray-300 text-gray-700 px-3 py-1 rounded-md hover:bg-gray-50 transition-colors duration-200 cursor-pointer !rounded-button whitespace-nowrap">
+                                <i class="fas fa-arrows-alt text-sm mr-1"></i> Move
+                            </button>
+                            <button id="resizeBtn" class="bg-white border border-gray-300 text-gray-700 px-3 py-1 rounded-md hover:bg-gray-50 transition-colors duration-200 cursor-pointer !rounded-button whitespace-nowrap">
+                                <i class="fas fa-expand-arrows-alt text-sm mr-1"></i> Resize
+                            </button>
+                            <button id="rotateBtn" class="bg-white border border-gray-300 text-gray-700 px-3 py-1 rounded-md hover:bg-gray-50 transition-colors duration-200 cursor-pointer !rounded-button whitespace-nowrap">
+                                <i class="fas fa-sync text-sm mr-1"></i> Rotate
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="canvasContainer" class="relative bg-gray-200 w-full flex items-center justify-center overflow-auto">
+                    <canvas id="fabricCanvas">
+                        
+                </div>   
+                <div class="p-4 bg-gray-50 flex justify-between">
+                    <button
+                        id="backToStep3"
+                        class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors duration-200 cursor-pointer !rounded-button whitespace-nowrap"
+                    >
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Back
+                    </button>
+                    <button
+                        id="saveDesignBtn"
+                        class="bg-primary text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition-colors duration-200 cursor-pointer !rounded-button whitespace-nowrap"
+                    >
+                        <i class="fas fa-save mr-2"></i>
+                        Save Design
+                    </button>
+                </div>
+            </div>
+            <div class="bg-indigo-50 rounded-lg p-6 border border-indigo-100">
+                <h3 class="text-lg font-medium text-indigo-900 mb-4">Tips for Perfect Placement</h3>
+                <ul class="space-y-2">
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-primary mt-1 mr-2"></i>
+                        <span class="text-indigo-800">Drag the bed to position it exactly where you want it in the room</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-primary mt-1 mr-2"></i>
+                        <span class="text-indigo-800">Use the corner handles to resize the bed to match the scale of your room</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-primary mt-1 mr-2"></i>
+                        <span class="text-indigo-800">Rotate the bed if needed to align with your room's layout</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-primary mt-1 mr-2"></i>
+                        <span class="text-indigo-800">Zoom in for precise placement and out to see the overall effect</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-lg p-8 max-w-sm w-full text-center">
+                <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary mx-auto mb-4"></div>
+                <h3 class="text-xl font-medium text-gray-900 mb-2">Processing Your Image</h3>
+                <p class="text-gray-600">This may take a few moments. Please wait...</p>
+            </div>
+        </div>
+
+        <section id="outputSection" class="hidden animate-fadeIn text-center py-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Your New Room Design!</h2>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto mb-8">
+                Here's your redesigned room. The image has also been downloaded to your system.
+            </p>
+            <div class="bg-white rounded-lg shadow-md p-6 max-w-4xl mx-auto">
+                <img id="finalDesignImage" src="" alt="Final Room Design" class="w-full h-auto object-contain rounded-md" />
+            </div>
+            <div class="mt-8">
+                <button
+                    id="startNewDesignBtn"
+                    class="bg-primary text-white px-6 py-3 rounded-md hover:bg-indigo-700 transition-colors duration-200 cursor-pointer !rounded-button whitespace-nowrap"
+                >
+                    <i class="fas fa-redo mr-2"></i> Start New Design
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <section id="featuresSection" class="bg-gray-50 py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">How It Works</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Transform your room in three simple steps
+                </p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white rounded-lg shadow-md p-6 text-center">
+                    <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-upload text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-medium text-gray-900 mb-2">1. Upload & Describe</h3>
+                    <p class="text-gray-600">
+                        Upload a photo of your room and tell us what you want to remove.
+                    </p>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6 text-center">
+                    <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-magic text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-medium text-gray-900 mb-2">2. Select Furniture</h3>
+                    <p class="text-gray-600">
+                        Browse our collection and choose the perfect bed for your space.
+                    </p>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6 text-center">
+                    <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-object-group text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-medium text-gray-900 mb-2">3. Position & Save</h3>
+                    <p class="text-gray-600">
+                        Arrange the furniture in your room and save your new design.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
